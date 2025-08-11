@@ -1,4 +1,4 @@
-package Praktikum.Constant;
+package ru.praktikum.constant;
 
 public class EndpointConstant {
     public static final String URL ="https://qa-scooter.praktikum-services.ru/";

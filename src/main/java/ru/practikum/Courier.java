@@ -1,4 +1,4 @@
-package Praktikum;
+package ru.practikum;
 
 public class Courier {
     private String login;

@@ -1,12 +1,12 @@
-package APITest;
+package ru.ApiTest;
 
-import Praktikum.Client.CourierClient;
-import Praktikum.Client.LogINClient;
-import Praktikum.Constant.RandomDataCourier;
-import Praktikum.Courier;
-import Praktikum.CourierLoginStep;
-import Praktikum.CourierStep;
-import Praktikum.Credentials;
+import ru.praktikum.client.CourierClient;
+import ru.praktikum.client.LogInClient;
+import ru.praktikum.constant.RandomDataCourier;
+import ru.praktikum.Courier;
+import ru.praktikum.CourierLoginStep;
+import ru.praktikum.CourierStep;
+import ru.praktikum.Credentials;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
@@ -17,8 +17,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 
-import static Praktikum.Constant.EndpointConstant.URL;
-import static Praktikum.Constant.RandomDataCourier.*;
+import static ru.praktikum.constant.EndpointConstant.URL;
+import static ru.praktikum.constant.RandomDataCourier.*;
 
 public class CreateCourierTest {
     CourierStep courierStep = new CourierStep();
@@ -29,7 +29,7 @@ public class CreateCourierTest {
     @Before
     public void setUp() {
         RestAssured.baseURI = URL;
-        //генеруруем логин еще раз так как в тесте есть ожидаемый баг(тест падает) не удалился предыдущий курьер
+        //генеруруем логин еще раз так как в тесте есть ожидаемый баг(тест падает) не удалилться предыдущий курьер
         RandomDataCourier.generateNewLogin();
 
     }
@@ -46,7 +46,7 @@ public class CreateCourierTest {
         Response createCourier = CourierClient.createCourier(courier);
         courierStep.courierAfterCreationSuccess(createCourier);
         Credentials creds = Credentials.fromCourier(courier);
-        Response loge = LogINClient.courierLoginCredit(creds);
+        Response loge = LogInClient.courierLoginCredit(creds);
         this.courierID = courierLoginStep.getIDFOrDeleting(loge);
 
 
@@ -58,11 +58,11 @@ public class CreateCourierTest {
     public void creatingCourierWhenLoginAlreadyUsed() {
         Courier courier = new Courier(RANDOM_LOGIN, RANDOM_PASS, RANDOM_FIRSTNAME);
         CourierClient.createCourier(courier);
-        Response createCourier = CourierClient.createCourier(courier);
-        courierStep.courierCreationLoginAlreadyUsed(createCourier);
-
+        Response createCourierTwi = CourierClient.createCourier(courier);
+        courierStep.courierCreationLoginAlreadyUsed(createCourierTwi);
+        //тут несовпадет код ошибки
         Credentials creds = Credentials.fromCourier(courier);
-        Response loge = LogINClient.courierLoginCredit(creds);
+        Response loge = LogInClient.courierLoginCredit(creds);
         this.courierID = courierLoginStep.getIDFOrDeleting(loge);
     }
 
@@ -71,7 +71,6 @@ public class CreateCourierTest {
     @Description("Creating  courier without login and checking the response")
     public void creatingCourierWithoutLoginBadRequest() {
         Courier courier = new Courier("", RANDOM_PASS, RANDOM_FIRSTNAME);
-        CourierClient.createCourier(courier);
         Response createCourierWithoutLogin = CourierClient.createCourier(courier);
         courierStep.courierAfterCreationErr(createCourierWithoutLogin);
     }
@@ -89,11 +88,10 @@ public class CreateCourierTest {
     @DisplayName("Creating  courier without firstName")
     @Description("Creating  courier without firstName and checking the response")
     public void creatingCourierWithoutfirstNameBadRequest() {
-
+        //у наставника уточнено что firstName обязатнльно и ждем 400
         Courier courier = new Courier(RANDOM_LOGIN, RANDOM_PASS, "");
-        Response createCourier = CourierClient.createCourier(courier);
-        // Проверка успешного создания
-        courierStep.courierAfterCreationSuccess(createCourier);
+        Response createCourierWithoutfirstName = CourierClient.createCourier(courier);
+        courierStep.courierAfterCreationErr(createCourierWithoutfirstName);
     }
 
     @After

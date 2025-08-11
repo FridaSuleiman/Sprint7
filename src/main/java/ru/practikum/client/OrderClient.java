@@ -1,10 +1,10 @@
-package Praktikum.Client;
+package ru.practikum.client;
 
-import Praktikum.CreateOrder;
+import ru.practikum.CreateOrder;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
-import static Praktikum.Constant.EndpointConstant.CREATE_ORDER;
+import static ru.practikum.constant.EndpointConstant.CREATE_ORDER;
 import static io.restassured.RestAssured.given;
 
 public class OrderClient {

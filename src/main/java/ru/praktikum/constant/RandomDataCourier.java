@@ -1,4 +1,4 @@
-package Praktikum.Constant;
+package ru.praktikum.constant;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -7,7 +7,7 @@ public class RandomDataCourier {
     public static String RANDOM_LOGIN= RandomStringUtils.randomAlphabetic(10);
     public static String RANDOM_PASS = RandomStringUtils.randomNumeric(10);
     public static String RANDOM_FIRSTNAME = RandomStringUtils.randomAlphabetic(10);
-    // метод генерации еще одного логина добавлен для тестов курьера так там есть ожидаемый баг и тест падает
+    // метод генерации еще одного логина добавлен для тестов курьера тк там есть ожидаемый баг и тест падает
     public static void generateNewLogin() {
         RANDOM_LOGIN = RandomStringUtils.randomAlphabetic(10);
     }

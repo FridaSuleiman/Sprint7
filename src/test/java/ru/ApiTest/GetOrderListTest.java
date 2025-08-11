@@ -1,13 +1,13 @@
-package APITest;
+package ru.ApiTest;
 
-import Praktikum.OrderStep;
+import ru.praktikum.OrderStep;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.Before;
 import org.junit.Test;
 
-import static Praktikum.Constant.EndpointConstant.URL;
+import static ru.praktikum.constant.EndpointConstant.URL;
 
 public class GetOrderListTest {
     @Before

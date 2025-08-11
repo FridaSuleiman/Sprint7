@@ -1,13 +1,13 @@
-package Praktikum.Client;
+package ru.praktikum.client;
 
-import Praktikum.Courier;
+import ru.praktikum.Courier;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import java.util.Map;
 
-import static Praktikum.Constant.EndpointConstant.CREATE_COURIER;
-import static Praktikum.Constant.EndpointConstant.DELETE_COURIER;
+import static ru.praktikum.constant.EndpointConstant.CREATE_COURIER;
+import static ru.praktikum.constant.EndpointConstant.DELETE_COURIER;
 import static io.restassured.RestAssured.given;
 
 public class CourierClient {

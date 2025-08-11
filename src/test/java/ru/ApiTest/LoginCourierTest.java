@@ -1,11 +1,11 @@
-package APITest;
+package ru.ApiTest;
 
-import Praktikum.Client.CourierClient;
-import Praktikum.Client.LogINClient;
-import Praktikum.Courier;
-import Praktikum.CourierLogin;
-import Praktikum.CourierLoginStep;
-import Praktikum.Credentials;
+import ru.praktikum.client.CourierClient;
+import ru.praktikum.client.LogInClient;
+import ru.praktikum.Courier;
+import ru.praktikum.CourierLogin;
+import ru.praktikum.CourierLoginStep;
+import ru.praktikum.Credentials;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
@@ -14,9 +14,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static Praktikum.Constant.EndpointConstant.URL;
-import static Praktikum.Constant.RandomDataCourier.*;
-
+import static ru.praktikum.constant.EndpointConstant.URL;
+import static ru.praktikum.constant.RandomDataCourier.*;
 
 public class LoginCourierTest {
     CourierLoginStep courierLoginStep = new CourierLoginStep();
@@ -34,11 +33,11 @@ public class LoginCourierTest {
 
 
     @DisplayName("Courier login is success")
-    @Description("Success request return status code 200 and id")
+    @Description("Success request return status code 200 and  id")
     @Test
     public void courierLoginSuccess() {
         CourierLogin courierLogin = new CourierLogin(RANDOM_LOGIN, RANDOM_PASS);
-        Response loginResponse = LogINClient.courierLogin(courierLogin);
+        Response loginResponse = LogInClient.courierLogin(courierLogin);
         courierLoginStep.responseHaveIDCourier(loginResponse);
     }
 
@@ -48,7 +47,7 @@ public class LoginCourierTest {
     public void courierLoginWrong() {
 
         CourierLogin courierLogin = new CourierLogin("wrong", RANDOM_PASS);
-        Response wrongLogin = LogINClient.courierLogin(courierLogin);
+        Response wrongLogin = LogInClient.courierLogin(courierLogin);
         courierLoginStep.checkAnswerWithoutLoginOrPassword(wrongLogin);
     }
 
@@ -58,7 +57,7 @@ public class LoginCourierTest {
     public void courierPasswordWrong() {
 
         CourierLogin courierLogin = new CourierLogin(RANDOM_LOGIN, "wrong");
-        Response wrongPassword = LogINClient.courierLogin(courierLogin);
+        Response wrongPassword = LogInClient.courierLogin(courierLogin);
         courierLoginStep.checkAnswerWithoutLoginOrPassword(wrongPassword);
     }
 
@@ -67,7 +66,7 @@ public class LoginCourierTest {
     @Description("login without courierLogin and request return status code 400")
     public void courierLoginWithoutLogin() {
         CourierLogin courierLogin = new CourierLogin("", RANDOM_PASS);
-        Response courierWithoutLoginAuthorization = LogINClient.courierLogin(courierLogin);
+        Response courierWithoutLoginAuthorization = LogInClient.courierLogin(courierLogin);
         courierLoginStep.checkAnswerWithoutData(courierWithoutLoginAuthorization);
 
     }
@@ -77,7 +76,7 @@ public class LoginCourierTest {
     @Description("login without courier password and request return status code 400")
     public void courierLoginWithoutPassword() {
         CourierLogin courierLogin = new CourierLogin(RANDOM_LOGIN, "");
-        Response courierWithoutPasswordAuthorization = LogINClient.courierLogin(courierLogin);
+        Response courierWithoutPasswordAuthorization = LogInClient.courierLogin(courierLogin);
         courierLoginStep.checkAnswerWithoutData(courierWithoutPasswordAuthorization);
 
     }
@@ -86,7 +85,7 @@ public class LoginCourierTest {
     @Description("login without data and request return status code 400")
     public void courierLoginWithoutData() {
         CourierLogin courierLogin = new CourierLogin("", "");
-        Response courierWithoutPasswordAuthorization = LogINClient.courierLogin(courierLogin);
+        Response courierWithoutPasswordAuthorization = LogInClient.courierLogin(courierLogin);
         courierLoginStep.checkAnswerWithoutData(courierWithoutPasswordAuthorization);
 
     }
@@ -96,7 +95,7 @@ public class LoginCourierTest {
     public void deleteCourier(){
         //курьер создан до теста с нормальным логином в тесте  намеренно путали данные-вызываем валидный логин и удаляем
         Credentials creds= Credentials.fromCourier(courier);
-        Response loge = LogINClient.courierLoginCredit(creds);
+        Response loge = LogInClient.courierLoginCredit(creds);
         courierLoginStep.responseHaveIDCourier(loge);
         int courierID = courierLoginStep.getIDFOrDeleting(loge);
         if (courierID != 0)  {

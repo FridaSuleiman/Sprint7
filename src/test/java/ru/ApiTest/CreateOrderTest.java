@@ -1,8 +1,8 @@
-package APITest;
+package ru.ApiTest;
 
-import Praktikum.Client.OrderClient;
-import Praktikum.CreateOrder;
-import Praktikum.OrderStep;
+import ru.praktikum.client.OrderClient;
+import ru.praktikum.CreateOrder;
+import ru.praktikum.OrderStep;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
@@ -14,7 +14,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.List;
 
-import static Praktikum.Constant.EndpointConstant.URL;
+import static ru.praktikum.constant.EndpointConstant.URL;
 
 @RunWith(Parameterized.class)
 public class CreateOrderTest {

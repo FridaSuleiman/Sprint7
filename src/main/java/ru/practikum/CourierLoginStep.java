@@ -1,4 +1,4 @@
-package Praktikum;
+package ru.practikum;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;

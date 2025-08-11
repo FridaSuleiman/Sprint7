@@ -1,11 +1,11 @@
-package Praktikum;
+package ru.practikum;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import java.util.List;
 
-import static Praktikum.Constant.EndpointConstant.ORDERS_LIST;
+import static ru.practikum.constant.EndpointConstant.ORDERS_LIST;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
