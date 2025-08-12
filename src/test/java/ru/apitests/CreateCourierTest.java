@@ -15,24 +15,41 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ErrorCollector;
+import org.junit.rules.TestWatcher;
 
 import static ru.practikum.constant.EndpointConstant.URL;
 
+// Исправленный импорт Description из Allure
+// import io.qameta.allure.Description; // оставляем как есть, он нужен для аннотации
+// Удаляем неправильный импорт с псевдонимом
+
 public class CreateCourierTest {
-    private int courierID = 0; // ID курьера, по умолчанию - не создан
-    CourierStep courierStep = new CourierStep();
-    CourierLoginStep courierLoginStep = new CourierLoginStep();
+    // Используем Integer для ID, чтобы отличать "не создан" (null) от 0
+    private Integer courierID = null;
+
+    // Флаг для отслеживания падения теста
+    private boolean testFailed = false;
+
+    // Правило для отслеживания ошибок теста
+    @Rule
+    public TestWatcher watcher = new TestWatcher() {
+        @Override
+        protected void failed(Throwable e, org.junit.runner.Description description) {
+            testFailed = true; // отмечаем, что тест упал
+        }
+    };
+
+    // Объекты для работы с шагами и клиентами
+    private final CourierStep courierStep = new CourierStep();
+    private final CourierLoginStep courierLoginStep = new CourierLoginStep();
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = URL;
-        // Генерируем новый логин перед каждым тестом
-        RandomDataCourier.generateNewLogin();
+        RestAssured.baseURI = URL; // базовый URL API
+        RandomDataCourier.generateNewLogin(); // генерируем новый логин перед каждым тестом
+        testFailed = false; // сбрасываем флаг перед каждым тестом
+        courierID = null; // сбрасываем ID курьера перед каждым тестом
     }
-
-    @Rule
-    public ErrorCollector collector = new ErrorCollector();
 
     @Test
     @DisplayName("Creating new courier")
@@ -52,6 +69,7 @@ public class CreateCourierTest {
     @Description("Creating courier with existing login checking the response")
     public void creatingCourierWhenLoginAlreadyUsed() {
         Courier courier = new Courier(RandomDataCourier.RANDOM_LOGIN, RandomDataCourier.RANDOM_PASS, RandomDataCourier.RANDOM_FIRSTNAME);
+
         // Создаем курьера один раз
         Response firstCreateResponse = CourierClient.createCourier(courier);
         courierStep.courierAfterCreationSuccess(firstCreateResponse);
@@ -72,9 +90,11 @@ public class CreateCourierTest {
     public void creatingCourierWithoutLoginBadRequest() {
         Courier courier = new Courier("", RandomDataCourier.RANDOM_PASS, RandomDataCourier.RANDOM_FIRSTNAME);
         Response createResponse = CourierClient.createCourier(courier);
-        // Проверяем, что сервер возвращает ошибку 400 (или другую ожидаемую)
+
+        // Проверяем, что сервер возвращает ошибку 400 или другую ожидаемую ошибку
         courierStep.courierAfterCreationErr(createResponse);
-        // Нет ID для удаления
+
+        // Нет ID для удаления, так как создание не удалось успешно
     }
 
     @Test
@@ -83,49 +103,52 @@ public class CreateCourierTest {
     public void creatingCourierWithoutPasswordBadRequest() {
         Courier courier = new Courier(RandomDataCourier.RANDOM_LOGIN, "", RandomDataCourier.RANDOM_FIRSTNAME);
         Response createResponse = CourierClient.createCourier(courier);
+
+        // Проверяем ошибку при создании без пароля
         courierStep.courierAfterCreationErr(createResponse);
+
+        // Нет ID для удаления, так как создание не удалось успешно
     }
 
     @Test
     @DisplayName("Creating courier without firstName")
     @Description("Creating courier without firstName and checking the response")
-    public void creatingCourierWithoutFirstNameBadRequest() {
-        // Создаем объект Courier без firstName (оставляем его null или пустым)
+    public void creatingCourierWithoutFirstName() {
+        // Создаем объект Courier без firstName (null)
         Courier courier = new Courier(RandomDataCourier.RANDOM_LOGIN, RandomDataCourier.RANDOM_PASS, null);
+
         Response createResponse = CourierClient.createCourier(courier);
 
-        // Предполагаемое поведение: API возвращает 201 (успешное создание)
-        // или ошибку 400. В зависимости от требований.
+        // Проверяем, что создание прошло успешно (статус 201)
+        createResponse.then().statusCode(201);
 
-        // Если ожидаем ошибку 400:
-        // courierStep.courierAfterCreationErr(createResponse);
-
-        // Если ожидаем успешное создание:
-
-        if (createResponse.statusCode() == 201) {
-            // Успешное создание — сохраняем ID для удаления
-            Credentials creds = new Credentials(RandomDataCourier.RANDOM_LOGIN, RandomDataCourier.RANDOM_PASS);
-            Response loginResponse = LogInClient.courierLoginCredit(creds);
-            this.courierID = courierLoginStep.getIDFOrDeleting(loginResponse);
-            // Можно добавить проверку тела ответа или статус кода
-            return;
-        } else {
-            // Иначе — считаем ошибкой и вызываем метод проверки ошибки
-            courierStep.courierAfterCreationErr(createResponse);
-        }
-
+        // Логинимся и сохраняем ID для удаления
+        Credentials creds = new Credentials(RandomDataCourier.RANDOM_LOGIN, RandomDataCourier.RANDOM_PASS);
+        Response loginResponse = LogInClient.courierLoginCredit(creds);
+        this.courierID = courierLoginStep.getIDFOrDeleting(loginResponse);
     }
 
     @After
     public void deleteCourier() {
-        if (courierID != 0) {
+        if (courierID != null) {
             try {
                 CourierClient.deleteCourier(courierID);
             } catch (Exception e) {
                 // Можно залогировать ошибку или оставить пустым,
                 // чтобы не мешать выполнению других тестов.
             }
-            courierID = 0;
+            courierID = null;
+        }
+
+        // В случае падения теста — выполнить вход курьера для получения ID (если он не был получен)
+        if (testFailed && this.courierID == null) {
+            try {
+                Credentials creds = new Credentials(RandomDataCourier.RANDOM_LOGIN, RandomDataCourier.RANDOM_PASS);
+                Response loginResponse = LogInClient.courierLoginCredit(creds);
+                this.courierID = courierLoginStep.getIDFOrDeleting(loginResponse);
+            } catch (Exception e) {
+                // Логировать или игнорировать ошибки входа при падении теста.
+            }
         }
     }
 }
